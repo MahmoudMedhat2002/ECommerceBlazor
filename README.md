@@ -4,4 +4,4 @@
 #### JWT Token For Authentication
 #### SQL Server as a database
 #### Entity framework along with code first migrations
-#### Using dependency injection and Repository design patterns
+#### Using Dependency injection and Repository design patterns
