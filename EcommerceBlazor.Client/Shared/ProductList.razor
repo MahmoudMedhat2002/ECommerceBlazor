@@ -1,0 +1,79 @@
+﻿@using EcommerceBlazor.Shared;
+@inject IProductService productService
+@implements IDisposable
+
+@if (productService.Products == null || productService.Products.Count == 0)
+{
+	<br />
+	<span style="font-size:20px">@productService.Message</span>
+}
+else
+{
+	<ul class="list-unstyled">
+		@foreach (var item in productService.Products)
+		{
+			<li class="media my-3">
+				<div class="media-img-wrapper">
+					<a href="/product/@item.Id">
+						@if (!string.IsNullOrEmpty(item.ImageURL))
+						{
+							<img class="media-img" src="@item.ImageURL" alt="@item.Title" />
+						}
+						else if (item.Images.Count > 0)
+						{
+							<img class="media-img" src="@item.Images[0].Data" alt="@item.Title" />
+						}
+						
+					</a>
+				</div>
+				<div class="media-body">
+					<a href="/product/@item.Id">
+						<h4 class="mb-0">@item.Title</h4>
+					</a>
+					<p>@item.Description</p>
+					<h5 class="price">
+						@GetPriceText(item)
+					</h5>
+				</div>
+			</li>
+		}
+
+	</ul>
+	for(int i = 1; i <= productService.PageCount; i++)
+	{
+		<a class="btn @(i == productService.CurrentPage ? "btn-info" : "btn-outline") page-selection" 
+		href="/search/@productService.LastSearchText/@i">@i</a>
+	}
+}
+
+@code {
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		productService.ProductChange += StateHasChanged;
+		base.OnInitializedAsync();
+	}
+
+	public void Dispose()
+	{
+		productService.ProductChange -= StateHasChanged;
+	}
+
+	public string GetPriceText(Product product)
+	{
+		var variants = product.Variants;
+
+		if (variants.Count == 0)
+		{
+			return string.Empty;
+		}
+		else if (variants.Count == 1)
+		{
+			return $"${variants[0].Price}";
+		}
+		decimal minPrice = variants.Min(v => v.Price);
+		return $"Starting at ${minPrice}";
+	}
+
+}
